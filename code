@@ -1,0 +1,32 @@
+Sub SendMail(SendItem As String)
+Dim oLook As Outlook.Application
+Dim oMail As Outlook.MailItem
+Dim Invoice As Workbook
+Dim wb As Workbook: Set wb = ThisWorkbook
+On Error GoTo err_Handle
+
+Set oLook = New Outlook.Application
+Set oMail = oLook.CreateItem(olMailItem)
+Set Invoice = wb.Sheets("Invoice")
+
+With oMail
+.To = Application.WorksheetFunction.VLookup(Invoice.Cells(8, 2), _
+    Range("EmailLookup"), 6, 0)
+    .CC = ""
+    .Subject = "Your Company Receipt"
+    .Body = "Attached is a PDF of your recept"
+    .Attachments.Add (SendItem)
+    .Send
+    End With
+    
+    MsgBox ("Your Invoice has Been Send")
+    Exit Sub
+err_Handle:
+    MsgBox ("Please Make Sure that you've saved your Invoice as a" _
+             & "PDF and Try again.")
+    oMail.Close (olDiscard)
+    oLook.Quit
+    
+    Set oMail = Nothing
+    Set oLook = Nothing
+End Sub
